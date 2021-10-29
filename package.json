@@ -1,6 +1,6 @@
 {
   "name": "@xmon/monitor",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "monitor most action by mitt",
   "main": "dist/index.js",
   "repository": "git@github.com:darkXmo/monitor.git",
