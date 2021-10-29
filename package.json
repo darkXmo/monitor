@@ -1,11 +1,18 @@
 {
   "name": "@xmon/monitor",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "monitor most action by mitt",
   "main": "dist/index.js",
   "repository": "git@github.com:darkXmo/monitor.git",
   "author": "Xmo <18851989097@163.com>",
-  "keywords": "event vue monitor aegis xmon",
+  "keywords": [
+    "event",
+    "vue",
+    "monitor",
+    "aegis",
+    "xmon",
+    "listener"
+  ],
   "license": "MIT",
   "dependencies": {
     "mitt": "^3.0.0"
