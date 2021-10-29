@@ -1,85 +1,259 @@
-# git-repo-clone ![npm license](https://img.shields.io/npm/l/git-repo-clone.svg?sanitize=true) ![npm version](https://img.shields.io/npm/v/git-repo-clone.svg?sanitize=true)
+# ageis-monitor ![npm license]() ![npm version]()
 
-git clone 仓库，只实现 clone 用于解决 download-git-repo 中出现交互，则命令行无法直接卡死的问题。
+页面行为监控，目前可以监控事件包括
+
+1. 点击事件（Click）
+2. 页面加载（Load & Unload）
+3. 特定行为（Action）
+4. Axios 请求（Api）
+
+5. 路由跳转（Router）
 
 ## 安装
 
 ```bash
 # yarn
-yarn add git-repo-clone
+yarn add @aegis/monitor
 
 # npm
-npm install git-repo-clone
+npm install @aegis/monitor
+
+# pnpm
+pnpm install @aegis/monitor
 ```
 
 ## 使用方法
 
+### 创建实例
+
 ```javascript
-  function clone(
-    gitHref: string,
-    branch?: string | undefined,
-    dir?: string | undefined,
-    empty?: boolean
-  ): Promise<string>;
+import { initMonitorVue } from "@aegis/monitor";
+const monitor = initMonitor();
 ```
 
-- `gitHref`: git 地址，例如 `https://github.com/darkXmo/git-repo-clone.git` 或 `https://gitee.com/dXmo/xmo-cli.git` ;
+### 创建监听 Vue 的实例(Vue-Router)
 
-- `branch`: git 分支，建议填写，例如 `master` 、 `development` 、 `production` 。
+```javascript
+// 如果不需要监听Vue-Router的路由跳转事件，可以采用标准Monitor
+import router from "@/router"; // 如果需要监听Vue-Router的路由跳转事件的话
+import { initMonitorVue } from "@aegis/monitor";
+const monitor = initMonitorVue(router);
+```
 
-- `dir`: 本地位置，即将仓库放在本地哪个目录下，默认为 Git 仓库名。
+### 开启监听事件
 
-- `empty`: clone 之后是否清空 `.git` 。
+#### 监听页面加载 Load 和 Unload 事件
 
-- 返回值：clone 下载的仓库的绝对地址，例如 `/home/xmo/code/git-repo-clone/testDirBranch` ;
+```javascript
+monitor.monitorPage();
+
+monitor.on("Load", (payload) => {
+  // Do Something
+  const href = payload.href;
+});
+
+monitor.on("Unload", (payload) => {
+  // Do Something
+  const href = payload.href;
+});
+```
+
+> 由于 `Unload` 事件出现于标签页关闭或刷新时，所以某些行为可能会无法执行。
+
+#### 监听页面加载 Click 事件
+
+```javascript
+// 需要传入 Filter 筛选要监听的 Dom
+// 例如，该 filter 监听所有 class 包含 monitored 的Dom
+const filter = (ele) => ele.classList.contains("monitored");
+monitor.monitorClick(filter);
+monitor.on("Click", (payload) => {
+  // Do Something, For example
+  const target = payload.target;
+});
+```
+
+#### 监听特定行为
+
+```javascript
+// 传入需要监听的行为（需要将行为包装成函数）
+const increase = Monitor.instance?.monitorEvent(
+  () => {
+    testMitt.emit("increase");
+  },
+  {
+    something: "芜湖", // 如果需要向行为进行额外的信息封装，可以在此处传入任意键值对
+    anything: "起飞",
+  }
+);
+monitor.on("Click", (payload) => {
+  // Do Something
+  // 此时payload中封装了something和anything
+  const something = payload.something;
+  const anything = payload.anything;
+});
+```
+
+#### 监听页面 Axios 请求 事件
+
+```javascript
+monitor.monitorPage();
+
+monitor.on("Api", (payload) => {
+  // Do Something
+  const url = payload.url;
+});
+```
+
+#### 监听页面加载 Router 跳转 事件
+
+```javascript
+monitor.monitorRouter();
+
+monitor.on("Route", (payload) => {
+  // Do Something
+  const path = payload.form.url;
+});
+```
+
+### Payload
+
+Payload 指监听事件发生时携带的信息。
+
+#### 点击事件（Click）
+
+```typescript
+interface ClickPayload {
+  target: HTMLElement; // 监听的对应 DOM
+  time: Date; // 监听事件发生的时间
+}
+```
+
+#### 页面加载（Load & Unload）
+
+```typescript
+interface LoadPayload {
+  duration: number; // 从页面开启到页面关闭之间的间隔
+  time: Date; // 监听页面事件发生时的时间
+  href: string; // 监听事件发生时页面的Href（即Url地址）
+}
+```
+
+#### 特定行为（Action）
+
+```typescript
+interface ActionPayload {
+  origin: () => any; // 监听的行为对象
+  time: Date; // 监听行为事件发生时的时间
+  [K: string]: any; // 其它任意主动注入的数据
+}
+```
+
+#### Axios 请求（Api）
+
+```typescript
+interface ApiPayload {
+  time: Date; // axios Api请求发生时的时间
+  url: string; // 请求的 url 地址
+  config: AxiosRequestConfig; // 请求的 config 所有配置
+  method: Method; // 请求方法，例如Get Post Put Delete (来自config)
+  header: any; // 请求头 (来自config)
+}
+```
+
+### 路由跳转（Router）
+
+```typescript
+interface RoutePayload {
+  from: RouteLocationNormalized; // 同 router.beforeEach((from, to) => {}) 中的 from
+  to: RouteLocationNormalized; // 同 router.beforeEach((from, to) => {}) 中的 to
+  time: Date; // 监听Route页面跳转事件发生时的时间
+}
+```
 
 ### Examples
 
 ```javascript
-import { clone } from "git-repo-clone";
-
-clone("https://github.com/darkXmo/xmo-cli.git");
-
-await clone("https://github.com/darkXmo/xmo-cli.git", "primary");
-
-const dir = await clone(
-  "https://github.com/darkXmo/xmo-cli.git",
-  undefined,
-  "localDir"
-);
-
-const dir: string = await clone(
-  "https://github.com/darkXmo/xmo-cli.git",
-  "primary",
-  "localDir"
-);
-
-const dir: string = await clone(
-  "https://github.com/darkXmo/xmo-cli.git",
-  "primary",
-  "localDir",
-  true
-);
-
-const dir: string = await clone(
-  "https://github.com/darkXmo/xmo-cli.git",
-  undefined,
-  undefined,
-  true
-);
+// main.js
+import router from "@/router"; // 如果需要监听Vue-Router的路由跳转事件的话
+import { initMonitorVue } from "@aegis/monitor";
+import initMonitorVue from "monitor.js";
+const monitor = initMonitorVue(router);
 ```
 
-> 如果需要使用 `dir` 参数又不想指定 `branch` ，就用 `undefined` 补全空位即可。
+```javascript
+// monitor.js
+const initBuried = (monitor) => {
+  const filter = (ele: HTMLElement) => ele.classList.contains("monitored");
+  monitor.monitorPage();
+  monitor.monitorClick(filter);
+  monitor.monitorRouter();
+  monitor.on("Action", (payload) => {
+    console.log(payload);
+  });
+  monitor.on("Click", (payload) => {
+    console.log(payload.target, "click");
+  });
+  monitor.on("Route", (payload) => {
+    console.log(payload, "Route");
+  });
+  monitor.on("Api", (payload) => {
+    console.log(payload, "Api");
+  });
+  monitor.on("Load", (payload) => {
+    console.log(payload, "Load");
+  });
 
-## 为什么不用 download-git-repo
-
-download-git-repo 遇到
-
-```bash
-The authenticity of host 'github.com (20.205.243.166)' can't be established.
-RSA key fingerprint is SHA256:xxxxxxxxxxxxxxxxxx.
+  monitor.on("Unload", (payload) => {
+    console.log(payload, "Unload");
+    const img = new Image(1, 1);
+    img.src = `http://localhost:8080/user/test?duration=${payload.duration}`;
+  });
+};
 ```
 
-无法启动交互，会卡死。
+创建实例(`initMonitor`)之后，在页面的任何地方都可以访问到实例 `monitor.instance` 。
 
-另外，`git-repo-clone` 使用 `typescript` 开发，类型检查更加到位。
+例如 Vue 组件内
+
+```vue
+<script setup lang="ts">
+import monitor from "@aegis/monitor";
+const increase = monitor.instance?.monitorEvent(
+  () => {
+    testMitt.emit("increase");
+  },
+  {
+    something: "芜湖",
+  }
+);
+</script>
+<template>
+  <div class="component-a">
+    <button @click="increase">+</button>
+  </div>
+</template>
+```
+
+或者其它 js 模块
+
+```javascript
+import axios from "axios";
+import monitor from "@aegis/monitor";
+
+const axiosInstance = axios.create({ ... });
+monitor.instance?.monitorAxios(axiosInstance);
+```
+
+**当然，你需要保障先创建好实例，再访问实例**
+
+> 由于 Unload 事件发生的时候，不允许发出 Axios 异步请求，但经测验，允许发送利用 Image 的 Get 请求，因此如果在 Unload 中有任何后端请求，尽可能采用这种方式。
+> 如果希望发送携带内容的 Post 请求，应当采用使用原生的 XMLHttpRequest 对象，让请求同步。
+
+## 开发指导
+
+本项目采用 Typescript 进行开发，编译为带 `import` 和 `export` 的 `ES5` 模块。
+
+项目利用 `Mitt` 来进行发布订阅，通过 `addEventListener` + `mitt.emit` 对 `Load` `Unload` `click` 事件进行订阅，利用 `axios` 和 `vueRouter` 的拦截器来实现 `Route` 和 `Api` 事件的订阅，对于特定的行为，则采用了将行为以函数的方式传入的方式来进行订阅。
+
+订阅完成之后，通过 `Mitt.on` 的方式，对订阅的行为进行监控，当行为执行时，会触发 `on` 中注册的方法，以实现监听事件的回调反馈。
