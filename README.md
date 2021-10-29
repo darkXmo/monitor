@@ -112,13 +112,14 @@ monitor.monitorRouter();
 
 monitor.on("Route", (payload) => {
   // Do Something
-  const path = payload.form.url;
+  const path = payload.from.url;
 });
 ```
 
 ### Payload
 
-Payload 指监听事件发生时携带的信息。
+Payload 指监听事件发生时携带的信息。即 `monitor.on("*", (payload) => { ... })` 中的 payload。
+不同的事件具备不同的 payload 类型，携带不同的 payload 信息，如下所示。
 
 #### 点击事件（Click）
 
