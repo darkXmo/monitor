@@ -13,13 +13,13 @@
 
 ```bash
 # yarn
-yarn add @aegis/monitor
+yarn add @xmon/monitor
 
 # npm
-npm install @aegis/monitor
+npm install @xmon/monitor
 
 # pnpm
-pnpm install @aegis/monitor
+pnpm install @xmon/monitor
 ```
 
 ## 使用方法
@@ -27,7 +27,7 @@ pnpm install @aegis/monitor
 ### 创建实例
 
 ```javascript
-import { initMonitorVue } from "@aegis/monitor";
+import { initMonitorVue } from "@xmon/monitor";
 const monitor = initMonitor();
 ```
 
@@ -36,7 +36,7 @@ const monitor = initMonitor();
 ```javascript
 // 如果不需要监听Vue-Router的路由跳转事件，可以采用标准Monitor
 import router from "@/router"; // 如果需要监听Vue-Router的路由跳转事件的话
-import { initMonitorVue } from "@aegis/monitor";
+import { initMonitorVue } from "@xmon/monitor";
 const monitor = initMonitorVue(router);
 ```
 
@@ -176,7 +176,7 @@ interface RoutePayload {
 ```javascript
 // main.js
 import router from "@/router"; // 如果需要监听Vue-Router的路由跳转事件的话
-import { initMonitorVue } from "@aegis/monitor";
+import { initMonitorVue } from "@xmon/monitor";
 import initMonitorVue from "monitor.js";
 const monitor = initMonitorVue(router);
 ```
@@ -217,20 +217,23 @@ const initBuried = (monitor) => {
 例如 Vue 组件内
 
 ```vue
-<script setup lang="ts">
-import monitor from "@aegis/monitor";
+<script setup>
+import monitor from "@xmon/monitor";
+const num = ref(0);
 const increase = monitor.instance?.monitorEvent(
   () => {
-    testMitt.emit("increase");
+    num.value++;
   },
   {
     something: "芜湖",
+    numValue: num.value,
   }
 );
 </script>
 <template>
   <div class="component-a">
     <button @click="increase">+</button>
+    <span>{{ num }}</span>
   </div>
 </template>
 ```
@@ -239,7 +242,7 @@ const increase = monitor.instance?.monitorEvent(
 
 ```javascript
 import axios from "axios";
-import monitor from "@aegis/monitor";
+import monitor from "@xmon/monitor";
 
 const axiosInstance = axios.create({ ... });
 monitor.instance?.monitorAxios(axiosInstance);
