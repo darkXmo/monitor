@@ -79,7 +79,7 @@ monitor.on("Click", (payload) => {
 // 传入需要监听的行为（需要将行为包装成函数）
 const increase = Monitor.instance?.monitorEvent(
   () => {
-    testMitt.emit("increase");
+    console.log("天気がいいから、散歩しましょう");
   },
   {
     something: "芜湖", // 如果需要向行为进行额外的信息封装，可以在此处传入任意键值对
