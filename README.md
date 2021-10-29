@@ -172,11 +172,11 @@ interface RoutePayload {
 }
 ```
 
-### Examples
+## Examples
 
 ```javascript
 // main.js
-import router from "@/router"; // 如果需要监听Vue-Router的路由跳转事件的话
+import router from "@/router"; // 如果需要监听Vue-Router的路由跳转事件的话，需要引入定义好的 VueRouter 实例
 import { initMonitorVue } from "@xmon/monitor";
 import initMonitorVue from "monitor.js";
 const monitor = initMonitorVue(router);
