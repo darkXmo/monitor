@@ -1,4 +1,4 @@
-# ageis-monitor ![npm license]() ![npm version]()
+# ageis-monitor [![npm license](https://img.shields.io/npm/l/@xmon/monitor.svg?sanitize=true)](https://github.com/darkXmo/monitor/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/@xmon/monitor.svg?sanitize=true)](https://www.npmjs.com/package/@xmon/monitor)
 
 页面行为监控，目前可以监控事件包括
 

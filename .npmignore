@@ -9,3 +9,5 @@ test
 commitlint*
 jest*
 /src
+pnpm*
+tsconfig.json
