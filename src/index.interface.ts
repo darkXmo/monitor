@@ -168,6 +168,10 @@ export namespace Payload {
      * 监听事件发生的时间
      */
     time: Date;
+    /**
+     * 在本页面等待的时间
+     */
+    duration: number;
   }
   export interface ApiPayload {
     /**

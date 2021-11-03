@@ -1,4 +1,4 @@
-# ageis-monitor [![npm license](https://img.shields.io/npm/l/@xmon/monitor.svg?sanitize=true)](https://github.com/darkXmo/monitor/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/@xmon/monitor.svg?sanitize=true)](https://www.npmjs.com/package/@xmon/monitor)
+# xmon-monitor [![npm license](https://img.shields.io/npm/l/@xmon/monitor.svg?sanitize=true)](https://github.com/darkXmo/monitor/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/@xmon/monitor.svg?sanitize=true)](https://www.npmjs.com/package/@xmon/monitor)
 
 页面行为监控，目前可以监控事件包括
 
@@ -169,6 +169,7 @@ interface RoutePayload {
   from: RouteLocationNormalized; // 同 router.beforeEach((from, to) => {}) 中的 from
   to: RouteLocationNormalized; // 同 router.beforeEach((from, to) => {}) 中的 to
   time: Date; // 监听Route页面跳转事件发生时的时间
+  duration: number; // 在上一个页面滞留的时间
 }
 ```
 

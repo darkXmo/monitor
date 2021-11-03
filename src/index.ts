@@ -121,9 +121,17 @@ export class MonitorVue extends Monitor {
     this.router = router;
   }
   monitorRouter() {
+    let start: Date = new Date();
     this.router.beforeEach(
       (to: MonitorRoute, from: MonitorRoute, next: NavigationGuardNext) => {
-        monitorMitt.emit("Route", { from, to, time: new Date() });
+        const duration = new Date().getTime() - start.getTime();
+        monitorMitt.emit("Route", {
+          from,
+          to,
+          time: new Date(),
+          duration: duration < 50 ? 0 : duration,
+        });
+        start = new Date();
         next();
       }
     );
