@@ -21,6 +21,7 @@ export const monitorMitt = mitt<{
 
 export class Monitor {
   observableEvent: [] = [];
+  start: Date = new Date();
 
   /**
    * 传入需要监听的Click的特征
@@ -54,7 +55,6 @@ export class Monitor {
   }
 
   monitorPage() {
-    let start: Date = new Date();
     window.addEventListener(
       "load",
       () => {
@@ -68,18 +68,15 @@ export class Monitor {
         passive: true,
       }
     );
-    monitorMitt.on("Load", (e) => {
-      start = new Date();
-    });
     window.addEventListener("beforeunload", (e) => {
       monitorMitt.emit("Unload", {
         href: window.location.href,
-        duration: new Date().getTime() - start.getTime(),
+        duration: new Date().getTime() - this.start.getTime(),
         time: new Date(),
       });
     });
     monitorMitt.on("Unload", (e) => {
-      start = new Date();
+      this.start = new Date();
     });
   }
 
@@ -88,8 +85,9 @@ export class Monitor {
     payload?: T
   ): () => any {
     return () => {
-      fn();
+      const ans = fn();
       monitorMitt.emit("Action", { ...payload, origin: fn, time: new Date() });
+      return ans;
     };
   }
 
@@ -121,17 +119,22 @@ export class MonitorVue extends Monitor {
     this.router = router;
   }
   monitorRouter() {
-    let start: Date = new Date();
+    let start: Date;
     this.router.beforeEach(
       (to: MonitorRoute, from: MonitorRoute, next: NavigationGuardNext) => {
+        if (!start) {
+          start = this.start;
+          next();
+          return;
+        }
         const duration = new Date().getTime() - start.getTime();
         monitorMitt.emit("Route", {
           from,
           to,
           time: new Date(),
-          duration: duration < 50 ? 0 : duration,
+          duration,
         });
-        start = new Date();
+        this.start = new Date();
         next();
       }
     );
